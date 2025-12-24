@@ -6,6 +6,13 @@ import SimulationControl from "./SimulationControl";
 import BusDetails from "./BusDetails";
 import StudentSearch from "./StudentSearch";
 
+import {
+  FiMapPin,
+  FiNavigation,
+  FiActivity,
+  FiTruck
+} from "react-icons/fi";
+
 export default function Transport() {
   const { buses } = useTransport();
 
@@ -65,16 +72,24 @@ export default function Transport() {
       {/* Header */}
 {/* Header */}
 <div className="flex items-center justify-between">
-  <div>
-    <h1 className="text-3xl font-bold">Campus Transport</h1>
-    <p className="text-white/50 text-sm">
+  <div className="space-y-1">
+    <h1 className="text-3xl font-semibold tracking-wide flex items-center gap-2">
+      <FiTruck className="text-cyan-400" />
+      Campus Transport
+    </h1>
+
+    <p className="text-white/50 text-sm flex items-center gap-2">
+      <FiMapPin className="text-white/40" />
       Simulated bus movement for campus transport visualization
     </p>
   </div>
 
-  <div className="flex items-center gap-2 text-xs px-3 py-1 rounded-full
-                  bg-blue-500/10 text-blue-400">
-    ● Demo Simulation
+  <div
+    className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full
+               bg-blue-500/10 text-blue-400 border border-blue-500/30"
+  >
+    <FiActivity className="text-blue-400" />
+    Demo Simulation
   </div>
 </div>
 

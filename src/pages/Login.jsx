@@ -6,39 +6,62 @@ export default function Login() {
   const { user, loginAsStudent, loginAsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // 🔒 Prevent logged-in users from seeing login page
+  // Redirect if already logged in
   useEffect(() => {
-    if (user?.role === "student") {
-      navigate("/dashboard");
-    } else if (user?.role === "admin") {
+    if (user?.role === "admin") {
       navigate("/admin");
+    } else if (user?.role === "student") {
+      navigate("/");
     }
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-zinc-900 p-6 rounded-xl w-80 space-y-4">
-        <h2 className="text-xl font-semibold text-center">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-black">
 
+      <div
+        className="w-96 bg-black/50 backdrop-blur
+                   border border-cyan-400/20
+                   rounded-xl p-6 space-y-5"
+      >
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-cyan-400">
+            Campus Flow
+          </h2>
+          <p className="text-sm text-white/60">
+            Choose how you want to continue
+          </p>
+        </div>
+
+        {/* Student Login */}
         <button
           onClick={() => {
             loginAsStudent();
-            navigate("/dashboard");
+            navigate("/");
           }}
-          className="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+          className="w-full py-2 rounded-lg
+                     bg-cyan-500/90 hover:bg-cyan-500
+                     text-black font-medium transition"
         >
           Login as Student
         </button>
 
+        {/* Admin Login */}
         <button
           onClick={() => {
             loginAsAdmin();
             navigate("/admin");
           }}
-          className="w-full py-2 bg-emerald-600 rounded-lg hover:bg-emerald-700 transition"
+          className="w-full py-2 rounded-lg
+                     bg-emerald-500/90 hover:bg-emerald-500
+                     text-black font-medium transition"
         >
           Login as Admin
         </button>
+
+        <p className="text-xs text-center text-white/40 pt-2">
+          Demo login. No credentials required.
+        </p>
       </div>
     </div>
   );

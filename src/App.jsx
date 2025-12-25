@@ -20,42 +20,39 @@ export default function App() {
     <div className="min-h-screen bg-black text-white">
       <Navbar />
 
-      <Routes>
-        {/* Public */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/transport" element={<Transport />} />
-        <Route path="/placements" element={<Placements />} />
-        <Route path="/campus-map" element={<CampusMap />} />
-        <Route path="/canteen" element={<Canteen />} />
+<Routes>
+  {/* Default */}
+  <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Attendance (single clean flow) */}
-        <Route path="/attendance" element={<Attendance />} />
+  {/* Public */}
+  <Route path="/login" element={<Login />} />
+  <Route path="/transport" element={<Transport />} />
+  <Route path="/placements" element={<Placements />} />
+  <Route path="/campus-map" element={<CampusMap />} />
+  <Route path="/canteen" element={<Canteen />} />
+  <Route path="/attendance" element={<Attendance />} />
 
-        {/* Student */}
-        <Route
-          path="/dashboard"
-          element={
-            user?.role === "student" ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+  {/* Student */}
+  <Route
+    path="/dashboard"
+    element={
+      user?.role === "student"
+        ? <Dashboard />
+        : <Navigate to="/login" replace />
+    }
+  />
 
-        {/* Admin */}
-        <Route
-          path="/admin"
-          element={
-            user?.role === "admin" ? (
-              <AdminPanel />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-      </Routes>
+  {/* Admin */}
+  <Route
+    path="/admin"
+    element={
+      user?.role === "admin"
+        ? <AdminPanel />
+        : <Navigate to="/login" replace />
+    }
+  />
+</Routes>
+
     </div>
   );
 }

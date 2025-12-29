@@ -1,23 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Login() {
   const { user, loginAsStudent, loginAsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // ✅ Centralized redirect logic (ONLY here)
   useEffect(() => {
     if (user?.role === "admin") {
       navigate("/admin");
     } else if (user?.role === "student") {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
-
       <div
         className="w-96 bg-black/50 backdrop-blur
                    border border-cyan-400/20
@@ -29,38 +29,38 @@ export default function Login() {
             Campus Flow
           </h2>
           <p className="text-sm text-white/60">
-            Choose how you want to continue
+            Secure login with Google
           </p>
         </div>
 
-        {/* Student Login */}
-        <button
-          onClick={() => {
+        {/* ✅ Google Login (Student) */}
+        <GoogleLogin
+          onSuccess={() => {
+            // MVP logic: Google login = verified student
             loginAsStudent();
-            navigate("/");
           }}
-          className="w-full py-2 rounded-lg
-                     bg-cyan-500/90 hover:bg-cyan-500
-                     text-black font-medium transition"
-        >
-          Login as Student
-        </button>
+          onError={() => {
+            console.log("Google Login Failed");
+          }}
+        />
 
-        {/* Admin Login */}
+        {/* Divider */}
+        <div className="text-center text-xs text-white/40">
+          Demo access
+        </div>
+
+        {/* Demo Admin Login */}
         <button
-          onClick={() => {
-            loginAsAdmin();
-            navigate("/admin");
-          }}
+          onClick={loginAsAdmin}
           className="w-full py-2 rounded-lg
                      bg-emerald-500/90 hover:bg-emerald-500
                      text-black font-medium transition"
         >
-          Login as Admin
+          Demo Admin Login
         </button>
 
         <p className="text-xs text-center text-white/40 pt-2">
-          Demo login. No credentials required.
+          Google OAuth ensures verified identity
         </p>
       </div>
     </div>

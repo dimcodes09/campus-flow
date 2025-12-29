@@ -21,26 +21,35 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        {/* Public */}
+        {/* Home stays public */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+
+        {/* Login: block if already logged in */}
+        <Route
+          path="/login"
+          element={
+            user
+              ? user.role === "admin"
+                ? <Navigate to="/admin" replace />
+                : <Navigate to="/dashboard" replace />
+              : <Login />
+          }
+        />
+
+        {/* Public Modules */}
         <Route path="/transport" element={<Transport />} />
         <Route path="/placements" element={<Placements />} />
         <Route path="/campus-map" element={<CampusMap />} />
         <Route path="/canteen" element={<Canteen />} />
-
-        {/* Attendance (single clean flow) */}
         <Route path="/attendance" element={<Attendance />} />
 
         {/* Student */}
         <Route
           path="/dashboard"
           element={
-            user?.role === "student" ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/login" />
-            )
+            user?.role === "student"
+              ? <Dashboard />
+              : <Navigate to="/login" replace />
           }
         />
 
@@ -48,15 +57,15 @@ export default function App() {
         <Route
           path="/admin"
           element={
-            user?.role === "admin" ? (
-              <AdminPanel />
-            ) : (
-              <Navigate to="/login" />
-            )
+            user?.role === "admin"
+              ? <AdminPanel />
+              : <Navigate to="/login" replace />
           }
         />
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
 }
-// deploy-test

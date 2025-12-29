@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function Login() {
-  const { user, loginAsStudent, loginAsAdmin } = useAuth();
+  const { user, loginWithGoogle, loginAsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ Centralized redirect logic (ONLY here)
+  // ✅ Redirect AFTER auth state changes
   useEffect(() => {
     if (user?.role === "admin") {
       navigate("/admin");
@@ -33,11 +33,11 @@ export default function Login() {
           </p>
         </div>
 
-        {/* ✅ Google Login (Student) */}
+        {/* ✅ Google Login → Student */}
         <GoogleLogin
           onSuccess={() => {
-            // MVP logic: Google login = verified student
-            loginAsStudent();
+            // IMPORTANT: use the correct function
+            loginWithGoogle();
           }}
           onError={() => {
             console.log("Google Login Failed");
@@ -60,7 +60,7 @@ export default function Login() {
         </button>
 
         <p className="text-xs text-center text-white/40 pt-2">
-          Google OAuth ensures verified identity
+          Google OAuth used for identity verification (MVP)
         </p>
       </div>
     </div>

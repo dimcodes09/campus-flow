@@ -6,19 +6,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   // ✅ Google OAuth login (MVP)
-  // For now, Google login = Student
-  const loginAsStudent = () => {
+  // Any Google login = Student (hackathon-safe)
+  const loginWithGoogle = () => {
     setUser({
       role: "student",
       provider: "google",
+      isAuthenticated: true,
     });
   };
 
-  // ✅ Demo admin login (used for dashboard showcase)
+  // ✅ Demo Admin login
   const loginAsAdmin = () => {
     setUser({
       role: "admin",
       provider: "demo",
+      isAuthenticated: true,
     });
   };
 
@@ -30,10 +32,9 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        loginAsStudent,
+        loginWithGoogle,
         loginAsAdmin,
         logout,
-        setUser, // exposed for future extension
       }}
     >
       {children}

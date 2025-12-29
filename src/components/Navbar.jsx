@@ -84,13 +84,6 @@ export default function Navbar() {
         ) : (
           <div className="flex items-center gap-3 ml-2">
             {/* Profile image if exists */}
-            {user.picture && (
-              <img
-                src={user.picture}
-                alt="profile"
-                className="w-8 h-8 rounded-full border border-cyan-400/40"
-              />
-            )}
 
             <button
               onClick={logout}

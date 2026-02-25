@@ -54,6 +54,16 @@ export default function Dashboard() {
             Interactive campus layout and locations
           </p>
         </div>
+
+        <div
+  onClick={() => navigate("/admin-services")}
+  className="cursor-pointer border border-white/10 rounded-lg p-6 hover:border-blue-500/50 transition"
+>
+  <h3 className="font-semibold mb-1">📄 Admin Services</h3>
+  <p className="text-sm text-gray-400">
+    Apply & track certificates and ID requests
+  </p>
+</div>
       </div>
     </div>
   );

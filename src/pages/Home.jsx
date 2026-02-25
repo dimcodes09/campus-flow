@@ -6,6 +6,7 @@ import {
   FiCoffee,
   FiBriefcase
 } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
 
 const FeatureCard = ({ to, title, desc, icon: Icon }) => {
   return (
@@ -109,6 +110,13 @@ const Home = () => {
             desc="Centralized view of upcoming drives and eligibility information."
             icon={FiBriefcase}
           />
+
+          <FeatureCard
+  to="/admin-services"
+  title="Admin Services"
+  desc="Track ID card and certificate request status digitally."
+  icon={FiFileText}
+/>
         </div>
 
         {/* FOOTER NOTE */}

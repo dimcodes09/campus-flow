@@ -5,11 +5,14 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./index.css";
 import App from "./App.jsx";
 
+
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { TransportProvider } from "./context/TransportContext.jsx";
 import { PlacementsProvider } from "./context/PlacementsContext.jsx";
 import { AttendanceProvider } from "./context/AttendanceContext.jsx";
 import { CanteenProvider } from "./context/CanteenContext.jsx";
+import { AdminServicesProvider } from "./context/AdminServicesContext";
+import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -19,12 +22,15 @@ createRoot(document.getElementById("root")).render(
           <PlacementsProvider>
             <AttendanceProvider>
               <CanteenProvider>
-                <App />
+                <AdminServicesProvider>
+                  <App />
+                </AdminServicesProvider>
               </CanteenProvider>
             </AttendanceProvider>
           </PlacementsProvider>
         </TransportProvider>
       </AuthProvider>
+      <Toaster position="top-right" />
     </GoogleOAuthProvider>
   </BrowserRouter>
 );

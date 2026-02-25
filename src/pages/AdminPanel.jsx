@@ -4,6 +4,7 @@ import AdminBusModal from "../modules/transport/AdminBusModal";
 import { useAttendance } from "../context/AttendanceContext";
 import { useCanteen } from "../context/CanteenContext";
 import { usePlacements } from "../context/PlacementsContext";
+import { useAdminServices } from "../context/AdminServicesContext";
 
 export default function AdminPanel() {
   /* TRANSPORT */
@@ -15,18 +16,25 @@ export default function AdminPanel() {
     updateStatus,
   } = useTransport();
 
+  /* ADMIN SERVICES */
+  const {
+    requests,
+    updateRequestStatus,
+    removeRequest,
+  } = useAdminServices();
+
   /* UI */
   const [showModal, setShowModal] = useState(false);
   const [editingBus, setEditingBus] = useState(null);
   const [activeSection, setActiveSection] = useState("overview");
 
   /* ATTENDANCE */
-const {
-  threshold,
-  alertsEnabled,
-  setThreshold,
-  setAlertsEnabled,
-} = useAttendance();
+  const {
+    threshold,
+    alertsEnabled,
+    setThreshold,
+    setAlertsEnabled,
+  } = useAttendance();
 
   /* CANTEEN */
   const {
@@ -36,48 +44,50 @@ const {
     addItem,
     removeItem,
     updateStatus: updateItemStatus,
+    updateItem,
+    toggleVisibility,
   } = useCanteen();
-const [search, setSearch] = useState("");
-const filteredMenu = menu.filter(i =>
-  i.name.toLowerCase().includes(search.toLowerCase())
-);
+
+  const [search, setSearch] = useState("");
+  const filteredMenu = menu.filter(i =>
+    i.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
 
-  //*PLACEMENTS 
+  /* PLACEMENTS */
+  const {
+    placements,
+    addPlacement,
+    updateStatus: updatePlacementStatus,
+    removePlacement,
+  } = usePlacements();
 
-const {
-  placements,
-  addPlacement,
-  updateStatus: updatePlacementStatus,
-  removePlacement,
-} = usePlacements();
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
+  const [branches, setBranches] = useState("");
+  const [type, setType] = useState("Placement");
+  const [date, setDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-const [company, setCompany] = useState("");
-const [role, setRole] = useState("");
-const [branches, setBranches] = useState("");
-const [type, setType] = useState("Placement");
-const [date, setDate] = useState("");
-const [filterStatus, setFilterStatus] = useState("all");
+  const [editingId, setEditingId] = useState(null);
+  const [editCompany, setEditCompany] = useState("");
+  const [editRole, setEditRole] = useState("");
+  const [editBranches, setEditBranches] = useState("");
+  const [editType, setEditType] = useState("Placement");
+  const [editDate, setEditDate] = useState("");
 
-const [editingId, setEditingId] = useState(null);
-const [editCompany, setEditCompany] = useState("");
-const [editRole, setEditRole] = useState("");
-const [editBranches, setEditBranches] = useState("");
-const [editType, setEditType] = useState("Placement");
-const [editDate, setEditDate] = useState("");
+  const filteredPlacements = placements.filter(p => {
+    const matchSearch =
+      p.company.toLowerCase().includes(search.toLowerCase()) ||
+      p.role.toLowerCase().includes(search.toLowerCase());
 
-const filteredPlacements = placements.filter(p => {
-  const matchSearch =
-    p.company.toLowerCase().includes(search.toLowerCase()) ||
-    p.role.toLowerCase().includes(search.toLowerCase());
+    const matchStatus =
+      filterStatus === "all" || p.status === filterStatus;
 
-  const matchStatus =
-    filterStatus === "all" || p.status === filterStatus;
-
-  return matchSearch && matchStatus;
-});
+    return matchSearch && matchStatus;
+  });
 
   return (
     <div className="min-h-screen bg-black text-white p-8 space-y-8">
@@ -89,7 +99,7 @@ const filteredPlacements = placements.filter(p => {
         </p>
       </div>
 
-      {/* Admin Navigation */}
+      {/* Navigation */}
       <div className="flex gap-4 flex-wrap">
         {[
           "overview",
@@ -97,6 +107,7 @@ const filteredPlacements = placements.filter(p => {
           "placements",
           "attendance",
           "canteen",
+          "admin-services",
           "map",
         ].map(key => (
           <button
@@ -117,9 +128,10 @@ const filteredPlacements = placements.filter(p => {
       {activeSection === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <AdminCard title="🚌 Transport" desc="Manage buses and routes" />
-          <AdminCard title="💼 Placements" desc="Post opportunities (demo)" />
+          <AdminCard title="💼 Placements" desc="Post opportunities" />
           <AdminCard title="✅ Attendance" desc="Configure rules" />
           <AdminCard title="🍽️ Canteen" desc="Manage menu and rush" />
+          <AdminCard title="📄 Admin Services" desc="Student requests" />
         </div>
       )}
 
@@ -183,437 +195,228 @@ const filteredPlacements = placements.filter(p => {
       )}
 
       {/* ATTENDANCE */}
-{activeSection === "attendance" && (
-  <div className="border border-white/10 rounded-lg p-6 space-y-4">
-    <h2 className="text-xl font-semibold">
-      Attendance Rules
-    </h2>
+      {activeSection === "attendance" && (
+        <div className="border border-white/10 rounded-lg p-6 space-y-4">
+          <h2 className="text-xl font-semibold">
+            Attendance Rules
+          </h2>
 
-    <input
-      type="number"
-      value={threshold}
-      onChange={e => setThreshold(+e.target.value)}
-      className="bg-black border border-white/20 px-3 py-1 rounded w-32"
-    />
+          <input
+            type="number"
+            value={threshold}
+            onChange={e => setThreshold(+e.target.value)}
+            className="bg-black border border-white/20 px-3 py-1 rounded w-32"
+          />
 
-    <label className="flex gap-2 items-center text-sm">
-      <input
-        type="checkbox"
-        checked={alertsEnabled}
-        onChange={() => setAlertsEnabled(p => !p)}
-      />
-      Enable attendance alerts
-    </label>
-  </div>
-)}
+          <label className="flex gap-2 items-center text-sm">
+            <input
+              type="checkbox"
+              checked={alertsEnabled}
+              onChange={() => setAlertsEnabled(p => !p)}
+            />
+            Enable attendance alerts
+          </label>
+        </div>
+      )}
 
       {/* CANTEEN */}
-{activeSection === "canteen" && (
-  <div className="space-y-8">
+      {activeSection === "canteen" && (
+        <div className="space-y-8">
+          <div className="border border-white/10 rounded-xl p-6 space-y-3">
+            <h2 className="text-xl font-semibold">Canteen Control</h2>
 
-    {/* Rush Control */}
-    <div className="border border-white/10 rounded-xl p-6 space-y-3">
-      <h2 className="text-xl font-semibold">Canteen Control</h2>
-
-      <div className="flex items-center gap-4">
-        <label className="text-sm text-gray-400">
-          Current Rush Level
-        </label>
-
-        <select
-          value={rushLevel}
-          onChange={e => setRushLevel(e.target.value)}
-          className="bg-black border border-white/20 px-3 py-2 rounded"
-        >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-    </div>
-
-    {/* Search */}
-    <input
-      placeholder="Search menu item"
-      value={search}
-      onChange={e => setSearch(e.target.value)}
-      className="bg-black border border-white/20 px-3 py-2 rounded w-full md:w-1/3"
-    />
-
-    {/* Menu Items */}
-    <div className="border border-white/10 rounded-xl p-6 space-y-5">
-      <h3 className="font-semibold text-lg">Menu Items</h3>
-
-      {filteredMenu.map(i => (
-        <div
-          key={i.id}
-          className="border border-white/10 rounded-lg p-4 space-y-3"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="font-medium">{i.name}</p>
-              <p className="text-xs text-gray-400">
-                ₹{i.price}
-                {i.previousPrice !== i.price && (
-                  <span className="text-yellow-400 ml-2">(updated)</span>
-                )}
-              </p>
-            </div>
-
-            <span className="text-xs px-2 py-1 rounded bg-white/10">
-              {i.status}
-            </span>
+            <select
+              value={rushLevel}
+              onChange={e => setRushLevel(e.target.value)}
+              className="bg-black border border-white/20 px-3 py-2 rounded"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-3">
-            <input
-              type="number"
-              value={i.price}
-              onChange={e =>
-                updateItem(i.id, {
-                  ...i,
-                  previousPrice: i.price,
-                  price: Number(e.target.value),
-                })
-              }
-              className="bg-black border border-white/20 px-3 py-2 rounded text-sm"
-            />
+          <input
+            placeholder="Search menu item"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="bg-black border border-white/20 px-3 py-2 rounded"
+          />
 
-            <input
-              placeholder="Reason"
-              value={i.reason || ""}
-              onChange={e =>
-                updateItem(i.id, { ...i, reason: e.target.value })
-              }
-              className="bg-black border border-white/20 px-3 py-2 rounded text-sm"
-            />
-
-            <input
-              placeholder="Refill time"
-              value={i.refillTime || ""}
-              onChange={e =>
-                updateItem(i.id, { ...i, refillTime: e.target.value })
-              }
-              className="bg-black border border-white/20 px-3 py-2 rounded text-sm"
-            />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => updateItemStatus(i.id, "available")}
-              className="btn-green text-xs"
-            >
-              Available
-            </button>
-
-            <button
-              onClick={() => updateItemStatus(i.id, "limited")}
-              className="btn-yellow text-xs"
-            >
-              Limited
-            </button>
-
-            <button
-              onClick={() => updateItemStatus(i.id, "soldout")}
-              className="btn-red text-xs"
-            >
-              Sold Out
-            </button>
-
-            <button
-              onClick={() => toggleVisibility(i.id)}
-              className="btn-blue text-xs"
-            >
-              {i.visible ? "Hide from students" : "Show to students"}
-            </button>
-
-            <button
-              onClick={() => removeItem(i.id)}
-              className="btn-red text-xs ml-auto"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-
-    {/* ADD NEW ITEM */}
-    <div className="border border-white/10 rounded-xl p-6 space-y-4">
-      <h3 className="font-semibold text-lg">Add New Item</h3>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <input
-          placeholder="Item name"
-          value={itemName}
-          onChange={e => setItemName(e.target.value)}
-          className="bg-black border border-white/20 px-3 py-2 rounded"
-        />
-
-        <input
-          placeholder="Price"
-          type="number"
-          value={price}
-          onChange={e => setPrice(e.target.value)}
-          className="bg-black border border-white/20 px-3 py-2 rounded"
-        />
-      </div>
-
-      <button
-        onClick={() => {
-          if (!itemName || !price) return;
-
-          addItem({
-            name: itemName,
-            price: Number(price),
-            previousPrice: Number(price),
-            status: "available",
-            visible: true,
-            reason: "",
-            refillTime: "",
-          });
-
-          setItemName("");
-          setPrice("");
-        }}
-        className="btn-green"
-      >
-        Add Item
-      </button>
-    </div>
-  </div>
-)}
-
-      {/* PLACEMENTS */}
-
-{activeSection === "placements" && (
-  <div className="space-y-6">
-
-    {/* ADD PLACEMENT */}
-    <div className="border border-white/10 rounded-lg p-6 space-y-4">
-      <h2 className="text-xl font-semibold">Add Placement / Internship</h2>
-
-      <input
-        placeholder="Company name"
-        value={company}
-        onChange={e => setCompany(e.target.value)}
-        className="input"
-      />
-
-      <input
-        placeholder="Role"
-        value={role}
-        onChange={e => setRole(e.target.value)}
-        className="input"
-      />
-
-      <input
-        placeholder="Eligible branches (CSE,IT)"
-        value={branches}
-        onChange={e => setBranches(e.target.value)}
-        className="input"
-      />
-
-      <select
-        value={type}
-        onChange={e => setType(e.target.value)}
-        className="input"
-      >
-        <option>Placement</option>
-        <option>Internship</option>
-      </select>
-
-      <input
-        type="date"
-        value={date}
-        onChange={e => setDate(e.target.value)}
-        className="input"
-      />
-
-      <button
-        onClick={() => {
-          if (!company || !role || !branches || !date) return;
-
-          addPlacement({
-            company,
-            role,
-            branches: branches.split(","),
-            type,
-            driveDate: date,
-            status: "open",
-          });
-
-          setCompany("");
-          setRole("");
-          setBranches("");
-          setDate("");
-        }}
-        className="btn-green"
-      >
-        Add Placement
-      </button>
-    </div>
-
-    {/* SEARCH + FILTER */}
-    <div className="flex flex-col md:flex-row gap-4">
-      <input
-        placeholder="Search company or role"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="input md:w-1/2"
-      />
-
-      <select
-        value={filterStatus}
-        onChange={e => setFilterStatus(e.target.value)}
-        className="input md:w-1/4"
-      >
-        <option value="all">All</option>
-        <option value="open">Open</option>
-        <option value="closed">Closed</option>
-      </select>
-    </div>
-
-    {/* LIST */}
-    <div className="space-y-3">
-      {filteredPlacements.map(p => (
-        <div
-          key={p.id}
-          className="border border-white/10 rounded p-4 space-y-3"
-        >
-          {editingId === p.id ? (
-            <>
-              <input
-                value={editCompany}
-                onChange={e => setEditCompany(e.target.value)}
-                className="input"
-              />
-              <input
-                value={editRole}
-                onChange={e => setEditRole(e.target.value)}
-                className="input"
-              />
-              <input
-                value={editBranches}
-                onChange={e => setEditBranches(e.target.value)}
-                className="input"
-              />
-              <select
-                value={editType}
-                onChange={e => setEditType(e.target.value)}
-                className="input"
+          <div className="space-y-3">
+            {filteredMenu.map(i => (
+              <div
+                key={i.id}
+                className="border border-white/10 rounded-lg p-4"
               >
-                <option>Placement</option>
-                <option>Internship</option>
-              </select>
-              <input
-                type="date"
-                value={editDate}
-                onChange={e => setEditDate(e.target.value)}
-                className="input"
-              />
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    updatePlacementStatus(p.id, {
-                      ...p,
-                      company: editCompany,
-                      role: editRole,
-                      branches: editBranches.split(","),
-                      type: editType,
-                      driveDate: editDate,
-                    });
-                    setEditingId(null);
-                  }}
-                  className="btn-green text-xs"
-                >
-                  Save
-                </button>
-
-                <button
-                  onClick={() => setEditingId(null)}
-                  className="btn-red text-xs"
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-medium">{p.company}</p>
-                  <p className="text-xs text-gray-400">{p.role}</p>
-                  <p className="text-xs text-gray-500">
-                    {p.type} | {p.driveDate}
-                  </p>
+                <div className="flex justify-between">
+                  <div>
+                    <p className="font-medium">{i.name}</p>
+                    <p className="text-xs text-gray-400">
+                      ₹{i.price}
+                    </p>
+                  </div>
+                  <span className="text-xs">{i.status}</span>
                 </div>
 
-                <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    p.status === "open"
-                      ? "bg-green-500/10 text-green-400"
-                      : "bg-red-500/10 text-red-400"
-                  }`}
-                >
-                  {p.status}
-                </span>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => updateItemStatus(i.id, "available")}
+                    className="btn-green text-xs"
+                  >
+                    Available
+                  </button>
+                  <button
+                    onClick={() => updateItemStatus(i.id, "limited")}
+                    className="btn-yellow text-xs"
+                  >
+                    Limited
+                  </button>
+                  <button
+                    onClick={() => removeItem(i.id)}
+                    className="btn-red text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => updatePlacementStatus(p.id, "open")}
-                  className="btn-green text-xs"
-                >
-                  Open
-                </button>
+          <div className="border border-white/10 rounded-xl p-6 space-y-3">
+            <h3 className="font-semibold">Add Item</h3>
 
-                <button
-                  onClick={() => updatePlacementStatus(p.id, "closed")}
-                  className="btn-red text-xs"
-                >
-                  Close
-                </button>
+            <input
+              placeholder="Name"
+              value={itemName}
+              onChange={e => setItemName(e.target.value)}
+              className="input"
+            />
 
-                <button
-                  onClick={() => {
-                    setEditingId(p.id);
-                    setEditCompany(p.company);
-                    setEditRole(p.role);
-                    setEditBranches(p.branches.join(","));
-                    setEditType(p.type);
-                    setEditDate(p.driveDate);
-                  }}
-                  className="btn-blue text-xs"
-                >
-                  Edit
-                </button>
+            <input
+              placeholder="Price"
+              type="number"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              className="input"
+            />
 
-                <button
-                  onClick={() => removePlacement(p.id)}
-                  className="btn-red text-xs"
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
+            <button
+              onClick={() => {
+                if (!itemName || !price) return;
+                addItem({
+                  name: itemName,
+                  price: Number(price),
+                  status: "available",
+                  visible: true,
+                });
+                setItemName("");
+                setPrice("");
+              }}
+              className="btn-green"
+            >
+              Add
+            </button>
+          </div>
         </div>
-      ))}
-    </div>
+      )}
+
+      {/* ADMIN SERVICES */}
+{activeSection === "admin-services" && (
+  <div className="space-y-6">
+    <h2 className="text-xl font-semibold">
+      Student Document Requests
+    </h2>
+
+    {requests.length === 0 && (
+      <p className="text-white/40 text-sm">
+        No requests submitted
+      </p>
+    )}
+
+    {requests.map(r => (
+      <div
+        key={r.id}
+        className="border border-white/10 bg-white/5 rounded-xl p-5 space-y-3"
+      >
+        {/* HEADER */}
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="font-semibold text-lg">
+              {r.type}
+            </p>
+            <p className="text-xs text-white/50">
+              {r.student} · {r.date}
+            </p>
+          </div>
+
+          {/* STATUS */}
+          <span
+            className={`px-3 py-1 text-xs rounded border ${
+              r.status === "Approved"
+                ? "bg-green-500/15 text-green-400 border-green-500/30"
+                : r.status === "Rejected"
+                ? "bg-red-500/15 text-red-400 border-red-500/30"
+                : "bg-yellow-500/15 text-yellow-400 border-yellow-500/30"
+            }`}
+          >
+            {r.status}
+          </span>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex gap-2 pt-2">
+          <button
+            disabled={r.status !== "Pending"}
+            onClick={() =>
+              updateRequestStatus(r.id, "Approved")
+            }
+            className={`px-3 py-1 rounded text-xs transition ${
+              r.status === "Approved"
+                ? "bg-green-600 text-black"
+                : r.status !== "Pending"
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-green-500/80 hover:bg-green-500 text-black"
+            }`}
+          >
+            Approve
+          </button>
+
+          <button
+            disabled={r.status !== "Pending"}
+            onClick={() =>
+              updateRequestStatus(r.id, "Rejected")
+            }
+            className={`px-3 py-1 rounded text-xs transition ${
+              r.status === "Rejected"
+                ? "bg-red-600 text-white"
+                : r.status !== "Pending"
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-red-500/80 hover:bg-red-500 text-white"
+            }`}
+          >
+            Reject
+          </button>
+
+          <button
+            onClick={() => removeRequest(r.id)}
+            className="ml-auto px-3 py-1 rounded text-xs bg-white/10 hover:bg-white/20"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ))}
   </div>
 )}
-
-
       {/* MAP */}
       {activeSection === "map" && (
         <DemoSection
           title="Campus Map Management"
           actions={[
-            "Add or edit campus locations",
-            "Enable or disable map markers",
-            "Link bus stops to routes",
+            "Add campus locations",
+            "Edit markers",
+            "Link bus stops",
           ]}
         />
       )}
@@ -670,4 +473,3 @@ function DemoSection({ title, actions }) {
     </div>
   );
 }
-

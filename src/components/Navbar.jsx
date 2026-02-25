@@ -61,6 +61,12 @@ export default function Navbar() {
           Campus Map
         </NavLink>
 
+        <NavLink to="/admin-services" className={({ isActive }) =>
+  `${linkClass} ${isActive ? activeClass : ""}`
+}>
+  Admin Services
+</NavLink>
+
         {user?.role === "admin" && (
           <NavLink to="/admin" className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : ""}`

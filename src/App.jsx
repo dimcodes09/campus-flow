@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
 import { useAuth } from "./context/AuthContext";
 import Canteen from "./pages/Canteen";
+import AdminServices from "./pages/AdminServices";
+import AdminServicesAdmin from "./modules/admin-services/AdminServicesAdmin";
 
 /* Modules */
 import Transport from "./modules/transport/Transport";
@@ -21,10 +23,10 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        {/* Home stays public */}
+        {/* Home */}
         <Route path="/" element={<Home />} />
 
-        {/* Login: block if already logged in */}
+        {/* Login */}
         <Route
           path="/login"
           element={
@@ -36,14 +38,34 @@ export default function App() {
           }
         />
 
-        {/* Public Modules */}
+        {/* Public */}
         <Route path="/transport" element={<Transport />} />
         <Route path="/placements" element={<Placements />} />
         <Route path="/campus-map" element={<CampusMap />} />
         <Route path="/canteen" element={<Canteen />} />
         <Route path="/attendance" element={<Attendance />} />
 
-        {/* Student */}
+        {/* Student Admin Services */}
+        <Route
+          path="/admin-services"
+          element={
+            user?.role === "student"
+              ? <AdminServices />
+              : <Navigate to="/login" replace />
+          }
+        />
+
+        {/* Admin Admin Services */}
+        <Route
+          path="/admin-services-admin"
+          element={
+            user?.role === "admin"
+              ? <AdminServicesAdmin />
+              : <Navigate to="/login" replace />
+          }
+        />
+
+        {/* Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -63,7 +85,7 @@ export default function App() {
           }
         />
 
-        {/* Catch-all */}
+        {/* Catch */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
